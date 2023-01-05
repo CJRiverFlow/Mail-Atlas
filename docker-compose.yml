@@ -1,0 +1,48 @@
+version:  "3.4"
+
+services:
+  db:
+    image: public.ecr.aws/zinclabs/zinc:latest
+    environment:
+      - ZINC_FIRST_ADMIN_USER=admin
+      - ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+      - ZINC_DATA_PATH=/data
+    volumes: 
+      - ./data:/data
+    ports:
+      - 4080:4080
+    networks:
+      - app
+  
+  api:
+    build:
+      context: ./backend/mailapp
+      dockerfile: Dockerfile
+    environment:
+      - ZINC_DB_URL=http://db:4080
+      - ZINC_DB_USER=admin
+      - ZINC_DB_PASSWORD=Complexpass#123
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    networks:
+      - app
+
+  ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports: 
+      - 8080:8080
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - db
+      - api
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge

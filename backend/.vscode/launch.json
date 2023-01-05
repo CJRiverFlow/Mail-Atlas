@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Go Run",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${fileDirname}",
+      "env": {
+        "ZINC_DB_URL": "http://localhost:4080",
+        "ZINC_DB_USER": "admin",
+        "ZINC_DB_PASSWORD": "Complexpass#123"
+      }
+    }
+  ]
+}
