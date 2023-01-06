@@ -27,8 +27,7 @@ $ ./indexer --path /abs/path/to/data
 ```
 Access to the UI with the url `http://localhost:8080`  
 You will see the main page to test the mail search:
-
-
+![ui](./images/ui.png)
 
 ## Techologies used
 * Go with chi router
@@ -36,6 +35,6 @@ You will see the main page to test the mail search:
 * Zinc DB
 * Docker
 
-# References
+## References
 * Running zinc with docker: [Documentation](https://docs.zincsearch.com/installation/)
 * Zinc official docker image: [AWS link](https://gallery.ecr.aws/zinclabs/zinc)

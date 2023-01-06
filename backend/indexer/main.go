@@ -104,7 +104,7 @@ func parseFile(filePath string) (msg string, err error) {
 	// fmt.Printf("%s\n", mail.MessageId)
 	jsonData, err := json.Marshal(mail)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to serialize email: %v", err)
 	}
 	return string(jsonData), nil
 	// fmt.Printf("%+v", mail)
