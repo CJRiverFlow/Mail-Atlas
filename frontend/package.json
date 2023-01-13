@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "flowbite": "^1.5.5",
+    "pinia": "^2.0.28",
     "serve": "^14.1.2",
     "vue": "^3.2.45"
   },

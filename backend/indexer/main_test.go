@@ -9,7 +9,7 @@
 	- go test -cpuprofile ./evaluation/cpu-1.prof -memprofile ./evaluation/mem-1.prof -bench .
 	- go tool pprof --web ./evaluation/cpu-1.prof
 	- go tool pprof --svg ./evaluation/cpu-1.prof > cpu-1.svg
-	- go tool pprof --top cpu.prof
+	- go tool pprof --top cpu-1.prof
 */
 package main
 

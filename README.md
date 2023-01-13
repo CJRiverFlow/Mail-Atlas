@@ -25,7 +25,12 @@ To upload the data in Zinc database:
 ```
 $ ./indexer --path /abs/path/to/data
 ```
-Access to the UI with the url `http://localhost:8080`  
+If you want to create a custom index run:
+```
+$ ./indexer --create-index=true --path /abs/path/to/data
+```
+
+3. Access to the UI with the url `http://localhost:8080`  
 You will see the main page to test the mail search:
 ![ui](./images/ui.png)
 

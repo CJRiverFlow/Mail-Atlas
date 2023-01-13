@@ -65,7 +65,17 @@ func NewMailFromFile(mailData *mail.Message) (mail *Mail, err error) {
 func main() {
 	var dataPath string
 	flag.StringVar(&dataPath, "path", "", "Absolute path to directory")
+	createIndex := flag.Bool("create-index", false, "Create index in database")
 	flag.Parse()
+
+	if *createIndex {
+		fmt.Println("Creating new index")
+		err := zh.CreateNewIndex()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 
 	if dataPath == "" {
 		fmt.Println("Error: no --path argument, please provide an absolute path")
@@ -137,6 +147,40 @@ func progressBar(current, total int) string {
 		strings.Repeat(" ", remaining), current, total)
 }
 
+// func iterateDir(path string) error {
+// 	fmt.Println("started indexing process")
+// 	fileCount, err := getFileCount(path)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	fmt.Printf("processing %v files\n", fileCount)
+// 	current := 0
+
+// 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+// 		if err != nil {
+// 			return fmt.Errorf("failed to process file %s: %w", path, err)
+// 		}
+// 		if info.IsDir() {
+// 			fmt.Printf("processing directory %s\n", info.Name())
+// 			return nil
+// 		}
+// 		data, err := parseFile(path)
+// 		if err != nil {
+// 			fmt.Printf("failed to parse file %s: %v\n", path, err)
+// 			return nil
+// 		}
+// 		if err := zh.PushSingleDoc(data); err != nil {
+// 			fmt.Printf("failed to push document: %v\n", err)
+// 			return nil
+// 		}
+// 		current++
+// 		if current%100 == 0 {
+// 			fmt.Print(progressBar(current, fileCount))
+// 		}
+// 		return nil
+// 	})
+// }
+
 func iterateDir(path string) error {
 	fmt.Println("started indexing process")
 	fileCount, err := getFileCount(path)
@@ -146,6 +190,28 @@ func iterateDir(path string) error {
 	fmt.Printf("processing %v files\n", fileCount)
 	current := 0
 
+	c := make(chan string)
+	go func() {
+		for path := range c {
+			data, err := parseFile(path)
+			if err != nil {
+				fmt.Printf("failed to parse file %s: %v\n", path, err)
+				current++
+				continue
+			}
+			go func() {
+				if err := zh.PushSingleDoc(data); err != nil {
+					fmt.Printf("failed to push document: %v\n", err)
+					return
+				}
+			}()
+			current++
+			if current%100 == 0 {
+				fmt.Print(progressBar(current, fileCount))
+			}
+		}
+	}()
+
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("failed to process file %s: %w", path, err)
@@ -154,19 +220,7 @@ func iterateDir(path string) error {
 			fmt.Printf("processing directory %s\n", info.Name())
 			return nil
 		}
-		data, err := parseFile(path)
-		if err != nil {
-			fmt.Printf("failed to parse file %s: %v\n", path, err)
-			return nil
-		}
-		if err := zh.PushSingleDoc(data); err != nil {
-			fmt.Printf("failed to push document: %v\n", err)
-			return nil
-		}
-		current++
-		if current%100 == 0 {
-			fmt.Print(progressBar(current, fileCount))
-		}
+		c <- path
 		return nil
 	})
 }

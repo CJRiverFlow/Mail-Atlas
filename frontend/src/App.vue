@@ -1,6 +1,7 @@
 <template>
   <div class="app">
     <h1 class="header">Mail Atlas &#x1F30D;</h1>
+    <FlashMessage v-if="flashStore.text" />
 
     <form @submit.prevent="submitForm" class="mx-8 my-8">
       <div class="relative">
@@ -36,8 +37,14 @@
 
 <script>
 import MailGrid from "./components/MailGrid.vue";
+import FlashMessage from "./components/FlashMessage.vue";
+import { useFlashStore } from "./stores/flashStore";
 
 export default {
+  setup() {
+    const flashStore = useFlashStore();
+    return { flashStore };
+  },
   data() {
     return {
       term: "",
@@ -46,29 +53,31 @@ export default {
   },
   components: {
     MailGrid,
+    FlashMessage,
   },
   methods: {
     async submitForm() {
       const body = { term: this.term };
-      const response = await fetch("http://localhost:3000/api/mails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-      if (response.ok) {
+      const apiHost = import.meta.env.VITE_API_HOST;
+      try {
+        const response = await fetch(`${apiHost}/api/mails`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
         const docs = await response.json();
         if ("Documents" in docs) {
           this.mails = docs.Documents;
         } else {
-          console.error(
-            "Error: API response does not contain a 'Documents' key"
-          );
-          this.mails = [];
+          throw new Error("Invalid response body");
         }
-      } else {
-        console.error(`Error: ${response.status} - ${response.statusText}`);
+      } catch (error) {
+        this.flashStore.showFlash(error.message);
         this.mails = [];
       }
     },

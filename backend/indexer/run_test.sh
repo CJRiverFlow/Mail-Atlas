@@ -8,5 +8,4 @@ ZINC_DB_PASSWORD=Complexpass#123
 export ZINC_DB_URL ZINC_DB_USER ZINC_DB_PASSWORD
 
 #execute the data loading
-go build
-exec ./indexer --path=/home/josuerf/projects/golang/search_engine/enron_mail_20110402
+exec go test

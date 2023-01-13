@@ -32,3 +32,4 @@ indexer.test
 data/*
 enron_mail_20110402.tgz
 enron_mail_20110402/*
+.env
